@@ -16,7 +16,7 @@ execute "sudo echo 'mysql-server mysql-server/root_password_again admin' | debco
 package 'mysql-server'
 service 'mysql' do
     supports :status => true, :restart => true, :reload => true
-    action [:enable, :start]
+    action [ :enable, :start ]
 end
 
 execute "mysql -u root -padmin < /vagrant/createUser.sql"
@@ -42,3 +42,10 @@ execute "createProject" do
 end
 execute "chmod -R 777 /var/www/myProject/storage"
 execute "sudo sed -i 's/DocumentRoot.*/DocumentRoot \\/var\\/www\\/myProject\\/public/' /etc/apache2/sites-available/000-default.conf"
+execute "sed -i '/mysql/{n;n;n;n;s/'\\''DB_DATABASE'\\'', '\\''.*'\\''/'\\''DB_DATABASE'\\'', '\\''myproject'\\''/g}' /var/www/myProject/config/database.php"
+execute "sed -i '/mysql/{n;n;n;n;n;s/'\\''DB_USERNAME'\\'', '\\''.*'\\''/'\\''DB_USERNAME'\\'', '\\''myproject'\\''/g}' /var/www/myProject/config/database.php"
+execute "sed -i '/mysql/{n;n;n;n;n;n;s/'\\''DB_PASSWORD'\\'', '\\''.*'\\''/'\\''DB_PASSWORD'\\'', '\\''mypassword'\\''/g}' /var/www/myProject/config/database.php"
+service 'apache2' do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :restart ]
+end
